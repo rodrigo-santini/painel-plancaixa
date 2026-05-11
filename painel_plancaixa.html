@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel CDL Planejamento de Caixa — 96 DAGs</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0f172a; --bg-card: #1e293b; --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8; --accent-green: #22c55e; --accent-red: #ef4444;
+            --accent-yellow: #eab308; --accent-blue: #3b82f6; --accent-purple: #a855f7;
+            --accent-cyan: #06b6d4; --border: #334155;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .header h1 { font-size: 1.4rem; font-weight: 600; }
+        .header-meta { font-size: 0.8rem; color: var(--text-secondary); }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .kpi-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+        .kpi-card .value { font-size: 1.8rem; font-weight: 700; margin-bottom: 2px; }
+        .kpi-card .label { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-card.s .value { color: var(--accent-green); }
+        .kpi-card.f .value { color: var(--accent-red); }
+        .kpi-card.r .value { color: var(--accent-blue); }
+        .kpi-card.d .value { color: var(--accent-purple); }
+        .kpi-card.t .value { color: var(--accent-cyan); }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        .chart-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+        .chart-card h3 { font-size: 0.85rem; font-weight: 500; margin-bottom: 12px; color: var(--text-secondary); }
+        .chart-container { position: relative; height: 220px; }
+        .section-title { font-size: 1rem; font-weight: 600; margin: 28px 0 14px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+        .table-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; overflow-x: auto; margin-bottom: 20px; }
+        .table-card h3 { font-size: 0.85rem; font-weight: 500; margin-bottom: 12px; color: var(--text-secondary); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+        th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--text-secondary); font-weight: 500; text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.4px; }
+        .badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 0.68rem; font-weight: 600; }
+        .badge.success { background: rgba(34,197,94,0.15); color: var(--accent-green); }
+        .badge.failed { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+        .badge.running { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+        .badge.nodata { background: rgba(148,163,184,0.15); color: var(--text-secondary); }
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+        .filter-bar input { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; color: var(--text-primary); font-size: 0.82rem; min-width: 220px; }
+        .filter-bar select { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; color: var(--text-primary); font-size: 0.82rem; }
+        @media (max-width: 768px) { .charts-grid { grid-template-columns: 1fr; } .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>📊 CDL Planejamento de Caixa — Painel Detalhado (96 DAGs)</h1>
+    <div class="header-meta">Semana: 04/05 a 10/05/2026 | Ambiente: cdl-airflow-mwaa (643861427533) | Gerado: 08/05/2026</div>
+</div>
+
+<div class="kpi-grid">
+    <div class="kpi-card s"><div class="value">16</div><div class="label">Sucesso</div></div>
+    <div class="kpi-card f"><div class="value">0</div><div class="label">Falhas</div></div>
+    <div class="kpi-card r"><div class="value">0</div><div class="label">Em Execução</div></div>
+    <div class="kpi-card d"><div class="value">8.5 min</div><div class="label">Duração Média</div></div>
+    <div class="kpi-card t"><div class="value">96</div><div class="label">DAGs Mapeadas</div></div>
+    <div class="kpi-card"><div class="value" style="color:var(--accent-green)">100%</div><div class="label">Disponibilidade</div></div>
+    <div class="kpi-card"><div class="value" style="color:var(--accent-yellow)">3/96</div><div class="label">DAGs Ativas (semana)</div></div>
+    <div class="kpi-card"><div class="value" style="color:var(--text-secondary)">93</div><div class="label">Sem Execução</div></div>
+</div>
+
+<div class="charts-grid">
+    <div class="chart-card"><h3>Execuções por Dia</h3><div class="chart-container"><canvas id="c1"></canvas></div></div>
+    <div class="chart-card"><h3>Status Geral</h3><div class="chart-container"><canvas id="c2"></canvas></div></div>
+    <div class="chart-card"><h3>Disponibilidade por DAG Ativa (%)</h3><div class="chart-container"><canvas id="c3"></canvas></div></div>
+    <div class="chart-card"><h3>Duração Média por DAG Ativa (min)</h3><div class="chart-container"><canvas id="c4"></canvas></div></div>
+</div>
+
+<h2 class="section-title">📋 Detalhamento por DAG — Todas as 96 DAGs</h2>
+
+<div class="filter-bar">
+    <input type="text" id="searchDag" placeholder="🔍 Filtrar por nome da DAG..." oninput="filterTable()">
+    <select id="filterOrch" onchange="filterTable()">
+        <option value="">Todos os Orquestradores</option>
+        <option value="COBRANCA_DIARIA_MAIN">Cobrança Diária Main (24)</option>
+        <option value="ARRECADACAO_DIARIA">Arrecadação Diária (23)</option>
+        <option value="ATHENAS_AMPLI">Athenas Ampli (13)</option>
+        <option value="COSMOS">Cosmos (7)</option>
+        <option value="CAIXA_DIARIO">Caixa Diário (6)</option>
+        <option value="RECEITA">Receita (14)</option>
+        <option value="OPERACAO">Operação (3)</option>
+        <option value="BOLSAS">Bolsas (3)</option>
+        <option value="INGESTAO">Ingestão (6)</option>
+    </select>
+    <select id="filterStatus" onchange="filterTable()">
+        <option value="">Todos os Status</option>
+        <option value="success">Sucesso</option>
+        <option value="failed">Falha</option>
+        <option value="nodata">Sem Execução</option>
+    </select>
+</div>
+
+<div class="table-card">
+    <table>
+        <thead><tr>
+            <th>#</th><th>DAG ID</th><th>Orquestrador</th><th>Status</th>
+            <th>Runs</th><th>Sucesso</th><th>Falha</th><th>Disponib.</th>
+            <th>Duração Média</th><th>Último Início</th><th>Último Fim</th>
+        </tr></thead>
+        <tbody id="dagTable"></tbody>
+    </table>
+</div>
+
+<script>
+Chart.defaults.color = '#94a3b8';
+
+const DAGS = [
+["PLANCAIXA_COBRANCA_DIARIA_MAIN","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_INGESTION_COBRANCA_DIARIA","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PipelineIngestIncrement","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_EXT_ORIGINAIS","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_EXT_ACORDOS","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_RECEBIMENTOS_BKO","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_TB_TITULOS","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_TB_STG_RAID_CART_COB_SALDO","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_TB_STG_RAID_CART_COB_SALDO_TOTAL","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_TB_STG_RAID_CART_COB","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_TBL_RECEBIMENTOS","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_EXT_PARCELAS","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_TB_VW_RECEBIMENTOS_MIS","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_FAT_RECEBIMENTOS","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_TB_ACORDOS_PROMESSAS","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_RAID_CD_CARTEIRA","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_TBL_BOLETOS_EXPORTACAO_MIS","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_DBO_CD_CARTEIRA","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_TBL_BOLETOS_CARGA_COLABORAR_SIAE","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_TB_ENVIO_ATP_CARGA_BOLETO","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_PROMESSA_MAIN_ORCHESTRATOR","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PROMESSA_PIPELINE_BASE_BOLETO_ANOMES","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PROMESSA_PIPELINE_PROMESSA_ANALITICO","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["COBRANCA_ALUNOS_ENTRANTES","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
+["PLANCAIXA_ARRECADACAO_DIARIA","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PLANCAIXA_INGESTAO_PROCS_ZEUS","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineZeusRecebimentosCOB","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineETLRecebimentosCOB","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineETLFaturamentoEAD","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineETLRecebimentoEAD","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineETLFaturamentoPresencial","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineEtlRecebimentoPresencial","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineETLAcordosOlimpo","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineETLColchaoOlimpo","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineNovoArrecadacao0001","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineZeusEscob","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineZeus0002","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineZeus0003","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineNovoArrecadacao0004","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineNovoArrecadacao0005","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineZeus0006","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineZeus0007","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineZeus9998","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineZeus9999","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineZeusConsolidadoResumoArrecadOrigem","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineZeusConsolidadoResumoArrecadacao","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineZeusConsolidadoArrecadEscob","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PipelineZeusConsolidadoBaseDaily","ARRECADACAO_DIARIA",0,0,0,null,null,null,null,null],
+["PLANCAIXA_ARRECADACAO_ATHENAS_AMPLI_DIARIA","ATHENAS_AMPLI",0,0,0,null,null,null,null,null],
+["PLANCAIXA_ARRECAD_INGESTION_ATHENAS_AMPLI","ATHENAS_AMPLI",0,0,0,null,null,null,null,null],
+["ARRECADACAO_ATHENAS","ATHENAS_AMPLI",0,0,0,null,null,null,null,null],
+["PLANCAIXA_TB_ARRECADACAO_AMPLI_RAID","ATHENAS_AMPLI",0,0,0,null,null,null,null,null],
+["PLANCAIXA_TB_ARRECADACAO_AMPLI_SOFIA","ATHENAS_AMPLI",0,0,0,null,null,null,null,null],
+["PLANCAIXA_TB_ARRECADACAO_AMPLI_SAP","ATHENAS_AMPLI",0,0,0,null,null,null,null,null],
+["PipelineZeus9998Ampli","ATHENAS_AMPLI",0,0,0,null,null,null,null,null],
+["TB_ARRECADACAO_CONSOLIDADA_ATHENAS","ATHENAS_AMPLI",0,0,0,null,null,null,null,null],
+["PipelineZeusConsolidadoBaseDailyAmpli","ATHENAS_AMPLI",0,0,0,null,null,null,null,null],
+["PipelineZeusConsolidadoResumoArrecadOrigemAmpli","ATHENAS_AMPLI",0,0,0,null,null,null,null,null],
+["PipelineZeusConsolidadoResumoArrecadacaoAmpli","ATHENAS_AMPLI",0,0,0,null,null,null,null,null],
+["TB_ARRECADACAO_ORIGEM_ATHENAS","ATHENAS_AMPLI",0,0,0,null,null,null,null,null],
+["TB_ARRECADACAO_RESUMO_ATHENAS","ATHENAS_AMPLI",0,0,0,null,null,null,null,null],
+["PLANCAIXA_ARRECADACAO_COSMOS_DIARIA","COSMOS",0,0,0,null,null,null,null,null],
+["PLANCAIXA_ARRECAD_INGESTION_COSMOS","COSMOS",0,0,0,null,null,null,null,null],
+["PipelineETLRecebimentosCOBAmpli","COSMOS",0,0,0,null,null,null,null,null],
+["ARRECADACAO_COSMOS","COSMOS",0,0,0,null,null,null,null,null],
+["TB_ARRECADACAO_CONSOLIDADA_COSMOS","COSMOS",0,0,0,null,null,null,null,null],
+["TB_ARRECADACAO_ORIGEM_COSMOS","COSMOS",0,0,0,null,null,null,null,null],
+["TB_ARRECADACAO_RESUMO_COSMOS","COSMOS",0,0,0,null,null,null,null,null],
+["CAIXA_DIARIO_MAIN_ORCHESTRATOR","CAIXA_DIARIO",0,0,0,null,null,null,null,null],
+["CAIXA_DIARIO_PIPELINE_FATURAMENTO_EAD","CAIXA_DIARIO",0,0,0,null,null,null,null,null],
+["CAIXA_DIARIO_PIPELINE_FATURAMENTO_CONSOLIDADO","CAIXA_DIARIO",0,0,0,null,null,null,null,null],
+["CAIXA_DIARIO_PIPELINE_ARRECADACAO","CAIXA_DIARIO",0,0,0,null,null,null,null,null],
+["CAIXA_DIARIO_PIPELINE_ARRECADACAO_CONSOLIDADO","CAIXA_DIARIO",0,0,0,null,null,null,null,null],
+["CAIXA_DIARIO_PIPELINE_FECHAMENTO_DIARIO","CAIXA_DIARIO",0,0,0,null,null,null,null,null],
+["PipelineReceitaOrchestrator","RECEITA",0,0,0,null,null,null,null,null],
+["COPY_TAB_PISTAS_RECEITA","RECEITA",0,0,0,null,null,null,null,null],
+["PipelineReceitaWorkBoletos","RECEITA",0,0,0,null,null,null,null,null],
+["PipelineReceitaWorkFinColaborador","RECEITA",0,0,0,null,null,null,null,null],
+["PipelineReceitaWorkFies","RECEITA",0,0,0,null,null,null,null,null],
+["PipelineReceitaWorkOutGratuidades","RECEITA",0,0,0,null,null,null,null,null],
+["PipelineReceitaWorkProuni","RECEITA",0,0,0,null,null,null,null,null],
+["PipelineReceitaWorkPagfacil","RECEITA",0,0,0,null,null,null,null,null],
+["PipelineReceitaWorkPEP","RECEITA",0,0,0,null,null,null,null,null],
+["PipelineReceitaWorkCredito","RECEITA",0,0,0,null,null,null,null,null],
+["PipelineReceitaWorkAceitePmtFinu","RECEITA",0,0,0,null,null,null,null,null],
+["PipelineReceitaWorkSitAlunoAceite","RECEITA",0,0,0,null,null,null,null,null],
+["PipelineReceitaWorkCaptacaoRetencao","RECEITA",0,0,0,null,null,null,null,null],
+["PipelineReceitaWorkConsolidada","RECEITA",0,0,0,null,null,null,null,null],
+["PipelineZeusOrchestratorOperacao","OPERACAO",0,0,0,null,null,null,null,null],
+["ABC_INTEGRATION_OPERACAO","OPERACAO",0,0,0,null,null,null,null,null],
+["PLANCAIXA_OPERACAO","OPERACAO",0,0,0,null,null,null,null,null],
+["PipelineBolsasOrchestrator","BOLSAS",0,0,0,null,null,null,null,null],
+["PipelineBolsasCopia","BOLSAS",0,0,0,null,null,null,null,null],
+["PipelineBolsasWork","BOLSAS",0,0,0,null,null,null,null,null],
+["PipelineZeusOrchestratorIngestao","INGESTAO",0,0,0,null,null,null,null,null],
+["PLANCAIXA_INGESTAO_PRESENCIAL","INGESTAO",0,0,0,null,null,null,null,null],
+["PLANCAIXA_INGESTAO_EAD","INGESTAO",0,0,0,null,null,null,null,null],
+["PLANCAIXA_INGESTAO_COLCHAO_OLIMPO","INGESTAO",0,0,0,null,null,null,null,null],
+["PLANCAIXA_INGESTAO_ACORDOS","INGESTAO",0,0,0,null,null,null,null,null],
+["PLANCAIXA_INGESTAO_PAGAMENTOS_RECEBIDOS","INGESTAO",0,0,0,null,null,null,null,null],
+];
+
+const REAL_DATA = {
+    "PLANCAIXA_RECEITA_LEGADO": {runs:5,success:5,failed:0,avail:100,dur:11.1,state:"success",start:"2026-05-08T06:29:04Z",end:"2026-05-08T06:39:23Z"},
+    "PLANCAIXA_RECEITA_PTC": {runs:6,success:6,failed:0,avail:100,dur:7.2,state:"success",start:"2026-05-08T04:43:37Z",end:"2026-05-08T04:47:12Z"},
+    "PLANCAIXA_VAIQUITAR": {runs:5,success:5,failed:0,avail:100,dur:7.6,state:"success",start:"2026-05-08T06:00:01Z",end:"2026-05-08T06:09:29Z"},
+};
+
+DAGS.forEach(d => {
+    const real = REAL_DATA[d[0]];
+    if (real) { d[2]=real.runs; d[3]=real.success; d[4]=real.failed; d[5]=real.avail; d[6]=real.dur; d[7]=real.state; d[8]=real.start; d[9]=real.end; }
+});
+
+const dn = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const daily = {"2026-05-04":[4,0],"2026-05-05":[3,0],"2026-05-06":[3,0],"2026-05-07":[3,0],"2026-05-08":[3,0]};
+const ds = Object.entries(daily).sort(([a],[b])=>a.localeCompare(b));
+
+new Chart(document.getElementById('c1'),{type:'bar',data:{labels:ds.map(([k])=>{const d=new Date(k+'T12:00:00');return `${dn[d.getDay()]} ${d.getDate()}/${d.getMonth()+1}`;}),datasets:[{label:'Sucesso',data:ds.map(([,v])=>v[0]),backgroundColor:'#22c55e',borderRadius:4},{label:'Falha',data:ds.map(([,v])=>v[1]),backgroundColor:'#ef4444',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8'}}},scales:{x:{stacked:true,ticks:{color:'#94a3b8'},grid:{color:'#334155'}},y:{stacked:true,ticks:{color:'#94a3b8'},grid:{color:'#334155'}}}}});
+
+new Chart(document.getElementById('c2'),{type:'doughnut',data:{labels:['Sucesso','Falha','Sem Execução'],datasets:[{data:[16,0,93],backgroundColor:['#22c55e','#ef4444','#334155'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',padding:14}}},cutout:'60%'}});
+
+const active = DAGS.filter(d=>d[2]>0);
+new Chart(document.getElementById('c3'),{type:'bar',data:{labels:active.map(d=>d[0].replace('PLANCAIXA_','')),datasets:[{label:'%',data:active.map(d=>d[5]||0),backgroundColor:active.map(d=>(d[5]||0)>=90?'#22c55e':(d[5]||0)>=70?'#eab308':'#ef4444'),borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{max:100,ticks:{color:'#94a3b8'},grid:{color:'#334155'}},y:{ticks:{color:'#94a3b8',font:{size:11}},grid:{display:false}}}}});
+
+new Chart(document.getElementById('c4'),{type:'bar',data:{labels:active.map(d=>d[0].replace('PLANCAIXA_','')),datasets:[{label:'min',data:active.map(d=>d[6]||0),backgroundColor:'#a855f7',borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#94a3b8'},grid:{color:'#334155'}},y:{ticks:{color:'#94a3b8',font:{size:11}},grid:{display:false}}}}});
+
+function renderTable(data) {
+    const tbody = document.getElementById('dagTable');
+    tbody.innerHTML = data.map((d,i) => {
+        const [id,orch,runs,s,f,avail,dur,state,start,end] = d;
+        const badge = state === 'success' ? '<span class="badge success">SUCCESS</span>' :
+                      state === 'failed' ? '<span class="badge failed">FAILED</span>' :
+                      state === 'running' ? '<span class="badge running">RUNNING</span>' :
+                      '<span class="badge nodata">SEM DADOS</span>';
+        const fmtDate = (dt) => dt ? new Date(dt).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
+        return `<tr>
+            <td>${i+1}</td>
+            <td><code>${id}</code></td>
+            <td>${orch}</td>
+            <td>${badge}</td>
+            <td>${runs||'-'}</td>
+            <td>${s||'-'}</td>
+            <td>${f||'-'}</td>
+            <td>${avail!=null?avail+'%':'-'}</td>
+            <td>${dur!=null?dur+' min':'-'}</td>
+            <td>${fmtDate(start)}</td>
+            <td>${fmtDate(end)}</td>
+        </tr>`;
+    }).join('');
+}
+
+function filterTable() {
+    const search = document.getElementById('searchDag').value.toLowerCase();
+    const orch = document.getElementById('filterOrch').value;
+    const status = document.getElementById('filterStatus').value;
+
+    const filtered = DAGS.filter(d => {
+        if (search && !d[0].toLowerCase().includes(search)) return false;
+        if (orch && d[1] !== orch) return false;
+        if (status === 'success' && d[7] !== 'success') return false;
+        if (status === 'failed' && d[7] !== 'failed') return false;
+        if (status === 'nodata' && d[7] != null) return false;
+        return true;
+    });
+    renderTable(filtered);
+}
+
+renderTable(DAGS);
+</script>
+</body>
+</html>
