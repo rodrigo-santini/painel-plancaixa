@@ -110,6 +110,7 @@
 Chart.defaults.color = '#94a3b8';
 
 const DAGS = [
+// [dag_id, orquestrador, runs, success, failed, availability, avg_dur_min, last_state, last_start, last_end]
 ["PLANCAIXA_COBRANCA_DIARIA_MAIN","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
 ["PLANCAIXA_INGESTION_COBRANCA_DIARIA","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
 ["PipelineIngestIncrement","COBRANCA_DIARIA_MAIN",0,0,0,null,null,null,null,null],
@@ -212,17 +213,20 @@ const DAGS = [
 ["PLANCAIXA_INGESTAO_PAGAMENTOS_RECEBIDOS","INGESTAO",0,0,0,null,null,null,null,null],
 ];
 
+// DAGs com dados reais do MWAA (cdl-airflow-mwaa) esta semana
 const REAL_DATA = {
     "PLANCAIXA_RECEITA_LEGADO": {runs:5,success:5,failed:0,avail:100,dur:11.1,state:"success",start:"2026-05-08T06:29:04Z",end:"2026-05-08T06:39:23Z"},
     "PLANCAIXA_RECEITA_PTC": {runs:6,success:6,failed:0,avail:100,dur:7.2,state:"success",start:"2026-05-08T04:43:37Z",end:"2026-05-08T04:47:12Z"},
     "PLANCAIXA_VAIQUITAR": {runs:5,success:5,failed:0,avail:100,dur:7.6,state:"success",start:"2026-05-08T06:00:01Z",end:"2026-05-08T06:09:29Z"},
 };
 
+// Enriquecer DAGS com dados reais onde disponível
 DAGS.forEach(d => {
     const real = REAL_DATA[d[0]];
     if (real) { d[2]=real.runs; d[3]=real.success; d[4]=real.failed; d[5]=real.avail; d[6]=real.dur; d[7]=real.state; d[8]=real.start; d[9]=real.end; }
 });
 
+// Gráficos
 const dn = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const daily = {"2026-05-04":[4,0],"2026-05-05":[3,0],"2026-05-06":[3,0],"2026-05-07":[3,0],"2026-05-08":[3,0]};
 const ds = Object.entries(daily).sort(([a],[b])=>a.localeCompare(b));
@@ -236,6 +240,7 @@ new Chart(document.getElementById('c3'),{type:'bar',data:{labels:active.map(d=>d
 
 new Chart(document.getElementById('c4'),{type:'bar',data:{labels:active.map(d=>d[0].replace('PLANCAIXA_','')),datasets:[{label:'min',data:active.map(d=>d[6]||0),backgroundColor:'#a855f7',borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#94a3b8'},grid:{color:'#334155'}},y:{ticks:{color:'#94a3b8',font:{size:11}},grid:{display:false}}}}});
 
+// Tabela
 function renderTable(data) {
     const tbody = document.getElementById('dagTable');
     tbody.innerHTML = data.map((d,i) => {
